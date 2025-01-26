@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dispatcher-service
+  labels:
+    app: dispatcher-service
+#Etat désirée pour l'application stateless order-service. Deployment spécifie la création d'un seul pod pour order-service
+spec:
+  replicas: 1 #Par défaut 1 - donc optionnel si 1 seul pod désiré.
+  #Indication du label permettant de déterminer le pod à "répliquer". Doit correspondre à un label indiqué dans template
+  selector:
+    matchLabels:
+      app: dispatcher-service
+  template:
+    metadata:
+      name: dispatcher-service #nom du pod
+      #déclaration du label permettant d'identifier le pod (doit correspondre à matchLabels ci-dessus)
+      labels:
+        app: dispatcher-service
+    spec:
+      containers:
+        - name: dispatcher-service
+          image: dispatcher-service
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 9003
+          # var d'env de configuration de catalog-service lors de son démarrage
+          env:
+            - name: BPL_JVM_THREAD_COUNT # configure le nombre de threads que la JVM peut créer au sein d'un container d'image BuildPacks
+              value: "50"
+            - name: SPRING_RABBITMQ_HOST
+              value: polar-rabbitmq
+            - name: SPRING_CLOUD_CONFIG_URI
+              value: "http://config-service"
+
+
+          lifecycle:
+            preStop:
+              exec:
+                command: [ "sh", "-c", "sleep 5" ]
+      
