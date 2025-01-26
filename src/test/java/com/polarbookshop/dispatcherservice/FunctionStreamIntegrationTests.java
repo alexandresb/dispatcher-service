@@ -18,8 +18,9 @@ import java.io.IOException;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-//Remplacé par une classe de config interne annotée @EnableTestBinder
+//Remplacé par @EnableTestBinder
 //@Import(TestChannelBinderConfiguration.class) //configuration du binder de test
+@EnableTestBinder
 public class FunctionStreamIntegrationTests {
     //injection de la représentation de l'input binding packlabel-in-0
     @Autowired
@@ -53,9 +54,4 @@ public class FunctionStreamIntegrationTests {
 
     }
 
-    //classe statique permettant la configuration du test binder
-    //préférée à l'utilisation de l'Import
-    @SpringBootApplication
-    @EnableTestBinder
-    public static class EnableTestBinderConfiguration {}
 }
