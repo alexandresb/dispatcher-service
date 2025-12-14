@@ -17,6 +17,10 @@ spec:
       #déclaration du label permettant d'identifier le pod (doit correspondre à matchLabels ci-dessus)
       labels:
         app: dispatcher-service
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: /actuator/prometheus
+        prometheus.io/port: "9003"
     spec:
       containers:
         - name: dispatcher-service
@@ -32,10 +36,19 @@ spec:
               value: polar-rabbitmq
             - name: SPRING_CLOUD_CONFIG_URI
               value: "http://config-service"
-
-
           lifecycle:
             preStop:
               exec:
                 command: [ "sh", "-c", "sleep 5" ]
-      
+          livenessProbe:
+            httpGet:
+              port: 9003
+              path: /actuator/health/liveness
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              port: 9003
+              path: /actuator/health/readiness
+            initialDelaySeconds: 10
+            periodSeconds: 15
