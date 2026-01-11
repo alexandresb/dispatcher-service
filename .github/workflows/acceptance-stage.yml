@@ -1,5 +1,4 @@
 name: Acceptance Stage
-
 on:
   workflow_run:
     workflows: ['Commit Stage']
